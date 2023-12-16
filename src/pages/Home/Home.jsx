@@ -27,16 +27,17 @@ const Home = () => {
   return (
     <>
       <div className="bg-primary w-full h-screen">
-        <Navbar />
+        <Navbar page="Home" />
         <div className="w-[980px]  m-auto">
           <div className="flex justify-start items-center gap-4">
             <img
               className="w-12 h-12"
               src="https://cdn-icons-png.flaticon.com/512/147/147144.png"
             />
+
             <div className="text-white">
-              <p>{data.displayName}</p>
-              <p className="text-sm">{data.email}</p>
+              <p>{data.displayName && data.displayName}</p>
+              <p className="text-sm">{data.email && data.email}</p>
             </div>
           </div>
           <div className="text-white  w-full">

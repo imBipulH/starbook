@@ -4,8 +4,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { MdPublic } from "react-icons/md";
 import Navbar from "../../components/Navbar.jsx/Navbar";
-import { getDatabase, onValue, push, ref, set } from "firebase/database";
+import { getDatabase, off, onValue, push, ref, set } from "firebase/database";
 import { userLoginInfo } from "../../slices/userSlice";
+import Timeline from "../../components/Timeline/Timeline";
 
 const Home = () => {
   const auth = getAuth();
@@ -13,18 +14,26 @@ const Home = () => {
   const navigate = useNavigate();
   const [verify, setVerify] = useState(false);
   const [post, setPost] = useState("");
-  const [singlePost, setSinglePost] = useState([]);
+
   const data = useSelector((state) => state.userLoginInfo.userInfo);
+
   const db = getDatabase();
 
-  onAuthStateChanged(auth, (user) => {
-    console.log(user, "user");
-    if (user.emailVerified) {
-      setVerify(true);
-      dispatch(userLoginInfo(user));
-      localStorage.setItem("userLoginInfo", JSON.stringify(user));
+  useEffect(() => {
+    if (!localStorage.getItem("userLoginInfo")) {
+      navigate("/login");
     }
-  });
+  }, []);
+
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user.emailVerified) {
+        setVerify(true);
+        dispatch(userLoginInfo(user));
+        localStorage.setItem("userLoginInfo", JSON.stringify(user));
+      }
+    });
+  }, []);
 
   const handlePost = () => {
     if (post.length > 0) {
@@ -32,23 +41,13 @@ const Home = () => {
         post: post,
         postSenderId: data.uid,
         postSenderName: data.displayName,
+        photoURL: data.photoURL,
         date: `${new Date().getFullYear()} - ${
           new Date().getMonth() + 1
         } - ${new Date().getDate()}, ${new Date().getHours()}:${new Date().getMinutes()}`,
       });
     }
   };
-
-  /*  useEffect(() => {
-    const singlePostRef = ref(db, "singlePost");
-    onValue(singlePostRef, (sanpshot) => {
-      let arr = [];
-      sanpshot.forEach((item) => {
-        arr.push(item.val());
-      });
-      setSinglePost(arr);
-    });
-  }, []); */
 
   return (
     <>
@@ -66,9 +65,9 @@ const Home = () => {
           </div>
         </div>
       ) : (
-        <div className="bg-primary w-full h-screen">
+        <div className="bg-primary w-full h-screen overflow-y-auto">
           <Navbar page="Home" />
-          <div className="w-[980px]  m-auto">
+          <div className="w-[980px] m-auto">
             <div className="flex justify-start items-center gap-4">
               <img className="w-12 h-12 rounded-full" src={data.photoURL} />
 
@@ -81,7 +80,7 @@ const Home = () => {
               <div className="w-full px-8">
                 <input
                   onChange={(e) => setPost(e.target.value)}
-                  value={post}
+                  //   value={post}
                   className="w-full box-border my-6 pl-8 py-2 rounded-md border border-gray-500 bg-transparent"
                   type="text"
                   placeholder="Write a post"
@@ -99,45 +98,12 @@ const Home = () => {
                 </button>
               </div>
             </div>
-
-            {/* Start of timeline */}
-
-            {singlePost &&
-              singlePost.map((item, id) => (
-                <div key={id}>
-                  <div className="text-white flex items-center gap-4 my-4">
-                    <img
-                      src="https://cdn-icons-png.flaticon.com/512/147/147144.png"
-                      alt="DP"
-                      className="w-12 h-12 rounded-full"
-                    />
-                    <div>
-                      <p className="text-xl text-white font-semibold">
-                        Bipul Hajong
-                      </p>
-                      <div className="flex items-center mt-1 gap-2">
-                        <p className="text-sm">8 hours ago</p>
-                        <MdPublic className="text-sm" />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="w-full px-12 border-b border-gray-500 pb-4">
-                    <p className="text-white text-xl">{item.post}</p>
-
-                    <div className="text-white flex items-center gap-8 mt-8">
-                      <p>
-                        Like <span>2</span>
-                      </p>
-                      <p>
-                        Comment <span>2</span>
-                      </p>
-                      <p>
-                        Share <span>2</span>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
+            {/* Start of timeline
+            
+          */}
+            <div className="w-full flex flex-col ">
+              <Timeline />
+            </div>
             {/* End of timeline */}
           </div>
         </div>

@@ -46,7 +46,7 @@ const Login = () => {
       signInWithEmailAndPassword(
         getAuth(),
         userData.email,
-        userData.password
+        userData.password,
       ).then((user) => {
         console.log(user.user);
         dispatch(userLoginInfo(user.user));

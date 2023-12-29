@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import Navbar from "../../components/Navbar.jsx/Navbar";
 import { BiUpload } from "react-icons/bi";
-import { useState, createRef } from "react";
+import { useState, createRef, useEffect } from "react";
 import Cropper from "react-cropper";
 import "cropperjs/dist/cropper.css";
 import {
@@ -10,7 +10,7 @@ import {
   ref,
   uploadString,
 } from "firebase/storage";
-import { getDatabase, ref as dref, update } from "firebase/database";
+import { getDatabase, ref as dref, update, onValue } from "firebase/database";
 import { getAuth, updateProfile } from "firebase/auth";
 
 const Profile = () => {
@@ -19,8 +19,6 @@ const Profile = () => {
   const [profileModal, setProfileModal] = useState(false);
   const [coverModal, setCoverModal] = useState(false);
   const [image, setImage] = useState("");
-  const [cover, setCover] = useState("");
-  const [profilePhoto, setProfilePhoto] = useState();
   const [coverPhoto, setCoverPhoto] = useState();
   const auth = getAuth();
   const [cropData, setCropData] = useState("#");
@@ -38,46 +36,41 @@ const Profile = () => {
     );
   };
 
-  const getCropData = () => {
-    if (typeof cropperRef.current?.cropper !== "undefined") {
-      setCropData(cropperRef.current?.cropper.getCroppedCanvas().toDataURL());
-      const message4 = cropData;
-      const storage = getStorage();
-      const storageRef = ref(storage, data.uid);
-      uploadString(storageRef, message4, "data_url").then(() => {
-        getDownloadURL(storageRef).then((downloadURL) => {
-          setProfilePhoto(downloadURL);
-          // setProfileModal(false);
-          updateProfile(auth.currentUser, {
-            photoURL: downloadURL,
-          }).then(() => {
-            update(dref(db, "users/" + data.uid), {
-              dp: downloadURL,
-            });
-            setProfileModal(false);
-          });
-        });
+  useEffect(() => {
+    const coverImgRef = dref(db, "users/" + data.uid);
+    const subscribe = () => {
+      onValue(coverImgRef, (snapshot) => {
+        const data = snapshot.val();
+        console.log(data);
+        setCoverPhoto(data.CoverPhoto);
       });
-    }
-  };
-  const getCoverData = () => {
+    };
+    return () => {
+      subscribe();
+    };
+  }, []);
+
+  const getCropData = (photo) => {
     if (typeof cropperRef.current?.cropper !== "undefined") {
       setCropData(cropperRef.current?.cropper.getCroppedCanvas().toDataURL());
-      const message4 = cropData;
       const storage = getStorage();
       const storageRef = ref(storage, data.uid);
-      uploadString(storageRef, message4, "Cover_Photo").then(() => {
+      uploadString(storageRef, cropData, "data_url").then(() => {
         getDownloadURL(storageRef).then((downloadURL) => {
-          setCoverPhoto(downloadURL); /* .then(() => {
-          // setProfileModal(false);
-          /*    updateProfile(auth.currentUser, {
-            photoURL: downloadURL,
-          }) */ /*
-            update(dref(db, "users/" + data.uid), {
-              coverPhoto: downloadURL,
+          if (photo == "profile") {
+            updateProfile(auth.currentUser, {
+              photoURL: downloadURL,
+            }).then(() => {
+              update(dref(db, "users/" + data.uid), {
+                profilePhoto: downloadURL,
+              });
             });
-            setCoverModal(false);
-          }); */
+          } else {
+            update(dref(db, "users/" + data.uid), {
+              CoverPhoto: downloadURL,
+            });
+          }
+          setProfileModal(false);
         });
       });
     }
@@ -96,24 +89,6 @@ const Profile = () => {
     const reader = new FileReader();
     reader.onload = () => {
       setImage(reader.result);
-    };
-    reader.readAsDataURL(files[0]);
-    console.log(image);
-  };
-
-  const coverUpload = (e) => {
-    e.preventDefault();
-    let files;
-    if (e.dataTransfer) {
-      files = e.dataTransfer.files;
-    } else if (e.target) {
-      files = e.target.files;
-    }
-    console.log(files, "files");
-    console.log(files[0]);
-    const reader = new FileReader();
-    reader.onload = () => {
-      setCover(reader.result);
     };
     reader.readAsDataURL(files[0]);
     console.log(image);
@@ -160,7 +135,7 @@ const Profile = () => {
 
                 <div className="flex justify-center gap-4 mt-4">
                   <button
-                    onClick={getCropData}
+                    onClick={() => getCropData("profile")}
                     className="text-xl bg-gray-600 rounded-md py-1 px-3 text-white"
                   >
                     Done
@@ -179,9 +154,8 @@ const Profile = () => {
             <>
               <div className="w-[600px] z-10 h-[500px] border border-gray-600 py-4 px-8 rounded-xl bg-primary absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                 <div className="text-3xl text-white text-center w-full">
-                  Change profile picture
+                  Change cover photo
                 </div>
-
                 <div className="my-2 flex items-center justify-center">
                   <Cropper
                     ref={cropperRef}
@@ -189,7 +163,7 @@ const Profile = () => {
                     zoomTo={0.5}
                     initialAspectRatio={1}
                     preview=".img-preview"
-                    src={cover}
+                    src={image}
                     viewMode={1}
                     minCropBoxHeight={10}
                     minCropBoxWidth={10}
@@ -203,7 +177,7 @@ const Profile = () => {
 
                 <div className="flex justify-center items-center my-2">
                   <input
-                    onChange={coverUpload}
+                    onChange={imageUpload}
                     className="text-gray-500 bg-red-500"
                     type="file"
                   />
@@ -211,10 +185,10 @@ const Profile = () => {
 
                 <div className="flex justify-center gap-4 mt-4">
                   <button
-                    onClick={getCoverData}
+                    onClick={() => getCropData("cover")}
                     className="text-xl bg-gray-600 rounded-md py-1 px-3 text-white"
                   >
-                    Done
+                    Upload
                   </button>
                   <button
                     onClick={() => setCoverModal(false)}
@@ -236,7 +210,7 @@ const Profile = () => {
                 />
                 <div className="bg-[#0000005d] group-hover:w-12 rounded-full h-12 right-0 bottom-0 absolute flex justify-center items-center ">
                   <BiUpload
-                    onClick={() => setProfileModal(true)}
+                    onClick={() => setCoverModal(true)}
                     className="group-hover:block hidden text-3xl text-white"
                   />
                 </div>
@@ -259,6 +233,7 @@ const Profile = () => {
               <div className="text-3xl my-1 font-semibold text-white">
                 {data.displayName}
               </div>
+
               <div className="text-xl font-semibold text-white">
                 MERN developer
               </div>

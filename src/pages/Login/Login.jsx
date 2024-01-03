@@ -48,7 +48,7 @@ const Login = () => {
         userData.email,
         userData.password,
       ).then((user) => {
-        console.log(user.user);
+        console.log(user, "login user");
         dispatch(userLoginInfo(user.user));
         localStorage.setItem("userLoginInfo", JSON.stringify(user.user));
         setTimeout(() => {

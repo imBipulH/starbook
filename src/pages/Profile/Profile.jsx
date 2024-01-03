@@ -26,7 +26,6 @@ const Profile = () => {
   const [coverModal, setCoverModal] = useState(false);
   const [image, setImage] = useState("");
   const [cover, setCover] = useState("");
-  const [profilePhoto, setProfilePhoto] = useState();
   const [coverPhoto, setCoverPhoto] = useState();
   const auth = getAuth();
   const [cropData, setCropData] = useState("#");
@@ -57,8 +56,8 @@ const Profile = () => {
     if (typeof cropperRef.current?.cropper !== "undefined") {
       setCropData(cropperRef.current?.cropper.getCroppedCanvas().toDataURL());
       const storage = getStorage();
-      const storageRef = ref(storage, data.uid);
-      uploadString(storageRef, cropData, "data_url_profile").then(() => {
+      const storageRef = ref(storage, "profile" + auth.currentUser.uid);
+      uploadString(storageRef, cropData, "data_url").then(() => {
         getDownloadURL(storageRef).then((downloadURL) => {
           updateProfile(auth.currentUser, {
             photoURL: downloadURL,
@@ -73,8 +72,8 @@ const Profile = () => {
     if (typeof cropperRef.current?.cropper !== "undefined") {
       setCropData(cropperRef.current?.cropper.getCroppedCanvas().toDataURL());
       const storage = getStorage();
-      const storageRef = ref(storage, data.uid);
-      uploadString(storageRef, cropData, "data_url_cover").then(() => {
+      const storageRef = ref(storage, "CoverPhoto" + data.uid);
+      uploadString(storageRef, cropData, "data_url").then(() => {
         getDownloadURL(storageRef).then((downloadURL) => {
           update(dref(db, "users/" + data.uid), {
             coverPhoto: downloadURL,
@@ -101,7 +100,6 @@ const Profile = () => {
       setImage(reader.result);
     };
     reader.readAsDataURL(files[0]);
-    console.log(image);
   };
 
   const getCoverPhotoData = (e) => {
@@ -185,8 +183,8 @@ const Profile = () => {
                   <Cropper
                     ref={cropperRef}
                     style={{ height: 400, width: "100%" }}
-                    zoomTo={0.5}
-                    initialAspectRatio={1}
+                    zoomTo={0}
+                    initialAspectRatio={16 / 5}
                     preview=".img-preview"
                     src={cover}
                     viewMode={1}

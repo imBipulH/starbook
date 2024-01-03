@@ -1,6 +1,8 @@
+import React from "react";
 import { getDatabase, off, onValue, ref } from "firebase/database";
 import { useState, useEffect } from "react";
 import { MdPublic } from "react-icons/md";
+import moment from "moment";
 
 const Timeline = () => {
   const [singlePost, setSinglePost] = useState([]);
@@ -50,7 +52,9 @@ const Timeline = () => {
                   {item.postSenderName && item.postSenderName}
                 </p>
                 <div className="flex items-center mt-1 gap-2">
-                  <p className="text-sm">8 hours ago</p>
+                  <p className="text-sm">
+                    {moment(item.date, "YYYY-MM-DD HH:mm").fromNow()}
+                  </p>
                   <MdPublic className="text-sm" />
                 </div>
               </div>

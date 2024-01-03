@@ -94,7 +94,7 @@ const Registration = () => {
           />
           <div className="absolute w-full top-[140px]">
             <div className="flex flex-col gap-2 w-[365px] m-auto bg-transparent ">
-              <p className="text-white text-lg bg-[#0a0a0a] w-[365px] m-auto rounded-lg py-2 text-center  font-bold">
+              <p className="text-white text-2xl bg-[#0a0a0a] w-[365px] m-auto rounded-lg py-2 text-center  font-bold">
                 Register your account
               </p>
               <input

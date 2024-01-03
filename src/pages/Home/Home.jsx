@@ -45,6 +45,9 @@ const Home = () => {
         date: `${new Date().getFullYear()} - ${
           new Date().getMonth() + 1
         } - ${new Date().getDate()}, ${new Date().getHours()}:${new Date().getMinutes()}`,
+      }).then(() => {
+        setPost("");
+        // window.location.reload();
       });
     }
   };
@@ -66,7 +69,9 @@ const Home = () => {
         </div>
       ) : (
         <div className="bg-primary w-full h-screen overflow-y-auto">
-          <Navbar page="Home" />
+          <div className="sticky top-0">
+            <Navbar page="Home" />
+          </div>
           <div className="w-[980px] m-auto">
             <div className="flex justify-start items-center gap-4">
               <img className="w-12 h-12 rounded-full" src={data.photoURL} />
@@ -80,7 +85,7 @@ const Home = () => {
               <div className="w-full px-8">
                 <input
                   onChange={(e) => setPost(e.target.value)}
-                  //   value={post}
+                  value={post}
                   className="w-full box-border my-6 pl-8 py-2 rounded-md border border-gray-500 bg-transparent"
                   type="text"
                   placeholder="Write a post"
@@ -92,7 +97,7 @@ const Home = () => {
                 <div className="bg-gray-500 w-full h-[1px]"></div>
                 <button
                   onClick={handlePost}
-                  className="px-2 py-1 text-sm bg-gray-500 text-white rounded relative "
+                  className="px-3 py-1 text-sm bg-gray-500 text-white rounded relative "
                 >
                   Post
                 </button>

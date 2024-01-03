@@ -10,7 +10,13 @@ import {
   ref,
   uploadString,
 } from "firebase/storage";
-import { getDatabase, ref as dref, update, onValue } from "firebase/database";
+import {
+  getDatabase,
+  ref as dref,
+  update,
+  onValue,
+  set,
+} from "firebase/database";
 import { getAuth, updateProfile } from "firebase/auth";
 
 const Profile = () => {
@@ -19,6 +25,8 @@ const Profile = () => {
   const [profileModal, setProfileModal] = useState(false);
   const [coverModal, setCoverModal] = useState(false);
   const [image, setImage] = useState("");
+  const [cover, setCover] = useState("");
+  const [profilePhoto, setProfilePhoto] = useState();
   const [coverPhoto, setCoverPhoto] = useState();
   const auth = getAuth();
   const [cropData, setCropData] = useState("#");
@@ -38,39 +46,41 @@ const Profile = () => {
 
   useEffect(() => {
     const coverImgRef = dref(db, "users/" + data.uid);
-    const subscribe = () => {
-      onValue(coverImgRef, (snapshot) => {
-        const data = snapshot.val();
-        console.log(data);
-        setCoverPhoto(data.CoverPhoto);
-      });
-    };
-    return () => {
-      subscribe();
-    };
+    onValue(coverImgRef, (snapshot) => {
+      const data = snapshot.val();
+      console.log(data);
+      setCoverPhoto(data.coverPhoto);
+    });
   }, []);
 
-  const getCropData = (photo) => {
+  const profileUpload = () => {
     if (typeof cropperRef.current?.cropper !== "undefined") {
       setCropData(cropperRef.current?.cropper.getCroppedCanvas().toDataURL());
       const storage = getStorage();
       const storageRef = ref(storage, data.uid);
-      uploadString(storageRef, cropData, "data_url").then(() => {
+      uploadString(storageRef, cropData, "data_url_profile").then(() => {
         getDownloadURL(storageRef).then((downloadURL) => {
-          if (photo == "profile") {
-            updateProfile(auth.currentUser, {
-              photoURL: downloadURL,
-            }).then(() => {
-              update(dref(db, "users/" + data.uid), {
-                profilePhoto: downloadURL,
-              });
-            });
-          } else {
-            update(dref(db, "users/" + data.uid), {
-              CoverPhoto: downloadURL,
-            });
-          }
+          updateProfile(auth.currentUser, {
+            photoURL: downloadURL,
+          });
           setProfileModal(false);
+        });
+      });
+    }
+  };
+
+  const coverUpload = () => {
+    if (typeof cropperRef.current?.cropper !== "undefined") {
+      setCropData(cropperRef.current?.cropper.getCroppedCanvas().toDataURL());
+      const storage = getStorage();
+      const storageRef = ref(storage, data.uid);
+      uploadString(storageRef, cropData, "data_url_cover").then(() => {
+        getDownloadURL(storageRef).then((downloadURL) => {
+          update(dref(db, "users/" + data.uid), {
+            coverPhoto: downloadURL,
+          }).then(() => {
+            setCoverModal(false);
+          });
         });
       });
     }
@@ -94,11 +104,26 @@ const Profile = () => {
     console.log(image);
   };
 
+  const getCoverPhotoData = (e) => {
+    e.preventDefault();
+    let files;
+    if (e.dataTransfer) {
+      files = e.dataTransfer.files;
+    } else if (e.target) {
+      files = e.target.files;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      setCover(reader.result);
+    };
+    reader.readAsDataURL(files[0]);
+  };
+
   return (
     <>
       <div className="bg-primary h-screen w-fll">
         <Navbar page="Profile" />
-        <div className=" m-auto w-[980px] my-2 h-screen">
+        <div className="m-auto w-[980px] my-2 h-screen">
           {profileModal && (
             <>
               <div className="w-[600px] z-10 h-[500px] border border-gray-600 py-4 px-8 rounded-xl bg-primary absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
@@ -135,7 +160,7 @@ const Profile = () => {
 
                 <div className="flex justify-center gap-4 mt-4">
                   <button
-                    onClick={() => getCropData("profile")}
+                    onClick={() => profileUpload()}
                     className="text-xl bg-gray-600 rounded-md py-1 px-3 text-white"
                   >
                     Done
@@ -163,7 +188,7 @@ const Profile = () => {
                     zoomTo={0.5}
                     initialAspectRatio={1}
                     preview=".img-preview"
-                    src={image}
+                    src={cover}
                     viewMode={1}
                     minCropBoxHeight={10}
                     minCropBoxWidth={10}
@@ -177,7 +202,7 @@ const Profile = () => {
 
                 <div className="flex justify-center items-center my-2">
                   <input
-                    onChange={imageUpload}
+                    onChange={getCoverPhotoData}
                     className="text-gray-500 bg-red-500"
                     type="file"
                   />
@@ -185,7 +210,7 @@ const Profile = () => {
 
                 <div className="flex justify-center gap-4 mt-4">
                   <button
-                    onClick={() => getCropData("cover")}
+                    onClick={() => coverUpload()}
                     className="text-xl bg-gray-600 rounded-md py-1 px-3 text-white"
                   >
                     Upload

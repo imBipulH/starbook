@@ -67,7 +67,7 @@ const Login = () => {
         />
         <div className="absolute w-full top-[150px]">
           <div className="flex flex-col gap-2 w-[365px] m-auto bg-transparent  ">
-            <p className="text-white w-[365px] text-lg m-auto rounded-lg  text-center my-2 font-bold select-none">
+            <p className="text-white w-[365px] text-2xl m-auto rounded-lg  text-center my-2 font-bold select-none">
               Log in to your account
             </p>
             <input

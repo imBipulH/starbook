@@ -3,13 +3,19 @@ import { Link, useNavigate } from "react-router-dom";
 import { IoHome, IoLogOutOutline, IoSearch } from "react-icons/io5";
 import { FaUser } from "react-icons/fa";
 import { TbMessageCircle } from "react-icons/tb";
+import { useDispatch } from "react-redux";
+import { userLoginInfo } from "../../slices/userSlice";
 
 const Navbar = ({ page }) => {
   const auth = getAuth();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const handleSignOut = () => {
     signOut(auth)
       .then(() => {
+        localStorage.removeItem("userLoginInfo");
+        //   dispatch(userLoginInfo(""));
         navigate("/login");
       })
       .catch((error) => {

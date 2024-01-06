@@ -18,10 +18,15 @@ import {
   set,
 } from "firebase/database";
 import { getAuth, updateProfile } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
   const data = useSelector((state) => state.userLoginInfo.userInfo);
   console.log(data);
+
+  const [edit, setEdit] = useState(false);
+  const [content, setContent] = useState("Your about content goes here");
+  const [newContent, setNewContent] = useState("");
   const [profileModal, setProfileModal] = useState(false);
   const [coverModal, setCoverModal] = useState(false);
   const [image, setImage] = useState("");
@@ -31,6 +36,7 @@ const Profile = () => {
   const [cropData, setCropData] = useState("#");
   const cropperRef = createRef();
   const db = getDatabase();
+  const navigate = useNavigate();
 
   const SideList = ({ title, description }) => {
     return (
@@ -42,6 +48,12 @@ const Profile = () => {
       </>
     );
   };
+
+  useEffect(() => {
+    if (!localStorage.getItem("userLoginInfo")) {
+      navigate("/login");
+    }
+  }, []);
 
   useEffect(() => {
     const coverImgRef = dref(db, "users/" + data.uid);
@@ -93,8 +105,6 @@ const Profile = () => {
     } else if (e.target) {
       files = e.target.files;
     }
-    console.log(files, "files");
-    console.log(files[0]);
     const reader = new FileReader();
     reader.onload = () => {
       setImage(reader.result);
@@ -117,10 +127,19 @@ const Profile = () => {
     reader.readAsDataURL(files[0]);
   };
 
+  const handleEdit = () => {
+    setEdit(!edit);
+    if (newContent !== null) {
+      setContent(newContent);
+    }
+  };
+
   return (
     <>
-      <div className="bg-primary h-screen w-fll">
-        <Navbar page="Profile" />
+      <div className="bg-primary h-screen w-fll overflow-y-auto">
+        <div className="sticky top-0 z-10">
+          <Navbar page="Profile" />
+        </div>
         <div className="m-auto w-[980px] my-2 h-screen">
           {profileModal && (
             <>
@@ -227,7 +246,7 @@ const Profile = () => {
             <div className="relative">
               <div className="group">
                 <img
-                  className="w-full h-40"
+                  className="w-full h-full"
                   src={coverPhoto}
                   alt="Cover-Photo"
                 />
@@ -238,13 +257,13 @@ const Profile = () => {
                   />
                 </div>
               </div>
-              <div className="absolute top-28 left-0  group">
+              <div className="absolute top-32 left-0  group">
                 <img
-                  className="w-20 h-20 rounded-full"
-                  src={data.photoURL}
+                  className="w-44 h-44 rounded-full"
+                  src={data.photoURL && data.photoURL}
                   alt="Profile-Photo"
                 />
-                <div className="bg-[#0000005d] group-hover:w-20 rounded-full h-20 top-0 left-0 absolute flex justify-center items-center ">
+                <div className="bg-[#0000005d] group-hover:w-44 rounded-full h-44 top-0 left-0 absolute flex justify-center items-center ">
                   <BiUpload
                     onClick={() => setProfileModal(true)}
                     className="group-hover:block hidden text-3xl text-white"
@@ -252,13 +271,39 @@ const Profile = () => {
                 </div>
               </div>
             </div>
-            <div className="mt-4">
-              <div className="text-3xl my-1 font-semibold text-white">
-                {data.displayName}
+            <div className="w-full mt-4  flex justify-start items-center gap-8 relative">
+              <div className=" flex-none flex-col justify-start">
+                <div className="text-3xl my-1 font-semibold text-white">
+                  {data.displayName}
+                </div>
+                <div className="text-lg font-semibold text-gray-600">
+                  {data.email}
+                </div>
               </div>
-
-              <div className="text-xl font-semibold text-white">
-                MERN developer
+              <div className="w-full grow ">
+                <button
+                  onClick={handleEdit}
+                  className="absolute right-0 bottom-0 text-white border border-gray-500 px-2 rounded-sm"
+                >
+                  Edit
+                </button>
+                {edit ? (
+                  <textarea
+                    readOnly="false"
+                    name="Bio"
+                    className="absolute z-10 top-0 right-0 bg-gray-600 w-[800px] h-[400px] p-2"
+                  />
+                ) : (
+                  <p className="text-md text-white w-full h-full">
+                    <span className="font-semibold text-gray-500">
+                      About Me:{" "}
+                    </span>
+                    I grew up in village. Then I moved into DHAKA at 18th. I
+                    started my career at age 18th. I workd at Grameen Uniqlo a
+                    japanees clothing brand for 8 year. Their vision was to make
+                    clothing for everyone to wear everywehere at any time.
+                  </p>
+                )}
               </div>
             </div>
           </div>

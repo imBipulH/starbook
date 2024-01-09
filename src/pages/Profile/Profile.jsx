@@ -134,12 +134,23 @@ const Profile = () => {
     }
   };
 
+  // I grew up in village. Then I moved into DHAKA at 18th. I started my career at age 18th. I workd at Grameen Uniqlo a japanees clothing brand for 8 year. Their vision was to make clothing for everyone to wear everywehere at any time.
+
   return (
     <>
       <div className="bg-primary h-screen w-fll overflow-y-auto">
         <div className="sticky top-0 z-10">
           <Navbar page="Profile" />
         </div>
+
+        {edit && (
+          <textarea
+            name="Bio"
+            value={newContent}
+            onChange={(e) => setNewContent(e.target.value)}
+            className="absolute text-white z-10 top-1/2 left-1/2 translate-x-[-50%] translate-y-[-50%]  bg-gray-600 w-[800px] h-[400px] p-2"
+          />
+        )}
         <div className="m-auto w-[980px] my-2 h-screen">
           {profileModal && (
             <>
@@ -285,25 +296,18 @@ const Profile = () => {
                   onClick={handleEdit}
                   className="absolute right-0 bottom-0 text-white border border-gray-500 px-2 rounded-sm"
                 >
-                  Edit
+                  {!edit ? "Edit" : "Save"}
                 </button>
-                {edit ? (
-                  <textarea
-                    readOnly="false"
-                    name="Bio"
-                    className="absolute z-10 top-0 right-0 bg-gray-600 w-[800px] h-[400px] p-2"
-                  />
-                ) : (
-                  <p className="text-md text-white w-full h-full">
-                    <span className="font-semibold text-gray-500">
-                      About Me:{" "}
-                    </span>
-                    I grew up in village. Then I moved into DHAKA at 18th. I
-                    started my career at age 18th. I workd at Grameen Uniqlo a
-                    japanees clothing brand for 8 year. Their vision was to make
-                    clothing for everyone to wear everywehere at any time.
-                  </p>
-                )}
+
+                <p
+                  style={{ whiteSpace: "pre-line" }}
+                  className="text-md text-white w-full h-full"
+                >
+                  <span className="font-semibold text-gray-500">
+                    About Me:{" "}
+                  </span>
+                  {newContent}
+                </p>
               </div>
             </div>
           </div>

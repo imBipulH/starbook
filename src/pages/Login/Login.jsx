@@ -1,5 +1,5 @@
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { userLoginInfo } from "../../slices/userSlice";
@@ -22,9 +22,9 @@ const Login = () => {
     }));
   };
 
-  const resetField = () => {
-    setUserData({ email: "", password: "" });
-  };
+  // const resetField = () => {
+  //   setUserData({ email: "", password: "" });
+  // };
 
   const handleLogin = () => {
     const emailReges = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -67,7 +67,7 @@ const Login = () => {
         />
         <div className="absolute w-full top-[150px]">
           <div className="flex flex-col gap-2 w-[365px] m-auto bg-transparent  ">
-            <p className="text-white w-[365px] text-2xl m-auto rounded-lg  text-center my-2 font-bold select-none">
+            <p className="text-white w-[365px] text-3xl m-auto rounded-lg  text-center my-2 font-bold select-none">
               Log in to your account
             </p>
             <input
@@ -76,8 +76,8 @@ const Login = () => {
               id="email"
               onChange={inputchange}
               value={userData.email}
-              placeholder="Username, phone number or email address"
-              className="m-auto pl-4 py-5 w-[365px] bg-[#121212] text-white rounded-lg focus:border-gray-300"
+              placeholder="Phone number or email address"
+              className="m-auto pl-4 py-5 w-[365px] bg-[#121212] text-white text-xl rounded-lg focus:border-gray-300"
             />
             <p className="-mt-2 pl-4 text-sm text-gray-600">{error.email}</p>
             <input
@@ -86,22 +86,22 @@ const Login = () => {
               id="password"
               onChange={inputchange}
               placeholder="Password"
-              className="m-auto pl-4 py-5 w-[365px] bg-[#121212] text-white rounded-lg"
+              className="m-auto pl-4 py-5 w-[365px] bg-[#121212] text-white rounded-lg text-xl"
             />
             <p className="-mt-2 pl-4 text-sm text-gray-600">{error.password}</p>
 
             <button
               onClick={handleLogin}
-              className="m-auto pl-4 py-5 w-[365px] font-bold bg-white text-gray-500 rounded-lg hover:text-black"
+              className="m-auto pl-4 py-5 w-[365px] font-bold bg-white text-gray-500 rounded-lg hover:text-black text-xl"
             >
               Log in
             </button>
 
-            <p className="text-gray-400 text-center cursor-pointer my-2">
+            <p className="text-gray-400 text-lg text-center cursor-pointer my-2">
               Forgot password?
             </p>
 
-            <p className="text-gray-400 text-center">
+            <p className="text-gray-400 text-center text-lg">
               No account?{" "}
               <Link to="/registration">
                 <span className="text-white cursor-pointer">Sign up</span>

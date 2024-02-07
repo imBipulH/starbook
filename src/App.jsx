@@ -9,7 +9,7 @@ function App() {
         <Routes>
           <Route path="login" elemRouteent={<Login />} />
           <Route path="registration" element={<Registration />} />
-        </RoRoute
+        </Routes>
       </BrowserRouter>
       <Registration />
     </>

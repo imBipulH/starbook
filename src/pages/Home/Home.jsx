@@ -1,10 +1,10 @@
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { MdPublic } from "react-icons/md";
+//import { MdPublic } from "react-icons/md";
 import Navbar from "../../components/Navbar.jsx/Navbar";
-import { getDatabase, off, onValue, push, ref, set } from "firebase/database";
+import { getDatabase, push, ref, set } from "firebase/database";
 import { userLoginInfo } from "../../slices/userSlice";
 import Timeline from "../../components/Timeline/Timeline";
 
@@ -14,9 +14,7 @@ const Home = () => {
   const navigate = useNavigate();
   const [verify, setVerify] = useState(false);
   const [post, setPost] = useState("");
-
   const data = useSelector((state) => state.userLoginInfo.userInfo);
-
   const db = getDatabase();
 
   useEffect(() => {
@@ -27,6 +25,7 @@ const Home = () => {
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
+      console.log(user)
       if (user.emailVerified) {
         setVerify(true);
         dispatch(userLoginInfo(user));

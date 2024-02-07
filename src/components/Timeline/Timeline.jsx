@@ -1,5 +1,5 @@
-import React from "react";
-import { getDatabase, off, onValue, ref } from "firebase/database";
+
+import { getDatabase, onValue, ref } from "firebase/database";
 import { useState, useEffect } from "react";
 import { MdPublic } from "react-icons/md";
 import moment from "moment";
@@ -8,29 +8,28 @@ const Timeline = () => {
   const [singlePost, setSinglePost] = useState([]);
   const db = getDatabase();
 
-  const handleSinglePost = () => {
-    const singlePostRef = ref(db, "singlePost/");
-    onValue(singlePostRef, (snapshot) => {
-      // let arr = [];
-      snapshot.forEach((item) => {
-        console.log(item.val());
-        //    arr.push(item.val());
-      });
-      // setSinglePost((prev) => [...prev, ...arr]);
-    });
-  };
+  // const handleSinglePost = () => {
+  //   const singlePostRef = ref(db, "singlePost/");
+  //   onValue(singlePostRef, (snapshot) => {
+  //     // let arr = [];
+  //     snapshot.forEach((item) => {
+  //       console.log(item.val());
+  //       //    arr.push(item.val());
+  //     });
+  //     // setSinglePost((prev) => [...prev, ...arr]);
+  //   });
+  // };
 
-  useEffect(() => {
-    handleSinglePost();
-  }, []);
+  // useEffect(() => {
+  //   handleSinglePost();
+  // }, []);
 
   useEffect(() => {
     const singlePostRef = ref(db, "singlePost");
     onValue(singlePostRef, (snapshot) => {
       let arr = [];
-      snapshot.forEach((item) => {
-        console.log(item.val());
-        arr.push(item.val());
+      snapshot.forEach((item) => {      
+        arr.push(item.val())
       });
       setSinglePost(arr);
     });
